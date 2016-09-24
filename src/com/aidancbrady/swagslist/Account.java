@@ -15,6 +15,14 @@ public class Account
 		this.username = username;
 	}
 	
+	public Account(String name, String username, String passwordSalt, String passwordHash)
+	{
+		this(name, username);
+		
+		this.passwordSalt = passwordSalt;
+		this.passwordHash = passwordHash;
+	}
+	
 	public boolean initPassword(String password)
 	{
 		try {

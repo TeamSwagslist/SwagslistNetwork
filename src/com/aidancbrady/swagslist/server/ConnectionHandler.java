@@ -1,4 +1,4 @@
-package com.aidancbrady.swagslist.network;
+package com.aidancbrady.swagslist.server;
 
 import java.net.Socket;
 
@@ -16,7 +16,7 @@ public class ConnectionHandler extends Thread
 				{
 					System.out.println("Initiating connection with " + connection.getInetAddress());
 					
-					new Connection(connection).start();
+					new ActiveConnection(connection).start();
 				}
 			}
 		} catch(Exception e) {

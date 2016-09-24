@@ -1,9 +1,8 @@
 package com.aidancbrady.swagslist;
 
+import java.sql.ResultSet;
 import java.util.EnumSet;
 import java.util.Set;
-
-import com.aidancbrady.swagslist.network.Connection;
 
 public class EventEntry
 {
@@ -23,7 +22,7 @@ public class EventEntry
 	
 	private EnumSet<SwagType> swagSet = EnumSet.noneOf(SwagType.class);
 	
-	public static EventEntry createEntry(String[] data, int start)
+	public static EventEntry createFromCSV(String[] data, int start)
 	{
 		EventEntry entry = new EventEntry();
 		
@@ -40,8 +39,9 @@ public class EventEntry
 		entry.longitude = Double.parseDouble(data[start+5]);
 		entry.startTime = Long.parseLong(data[start+6]);
 		entry.endTime = Long.parseLong(data[start+7]);
+		entry.parseSwagSetCSV(data[start+8]);
 		
-		String[] swagSplit = data[start+8].split(Connection.SPLITTER_2);
+		String[] swagSplit = data[start+8].split(SharedData.SPLITTER_2);
 		
 		for(String s : swagSplit)
 		{
@@ -55,6 +55,40 @@ public class EventEntry
 		}
 		
 		return entry;
+	}
+	
+	public static EventEntry createFromSQL(ResultSet results)
+	{
+		try {
+			EventEntry entry = new EventEntry();
+			entry.name = results.getString("name");
+			entry.description = results.getString("description");
+			entry.ownerUsername = results.getString("owner");
+			entry.premium = results.getBoolean("premium");
+			entry.latitude = results.getDouble("latitude");
+			entry.longitude = results.getDouble("longitude");
+			entry.startTime = results.getLong("startTime");
+			entry.endTime = results.getLong("endTime");
+			entry.parseSwagSetCSV(results.getString("swagSet"));
+			return entry;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public String toCSV()
+	{
+		return name + SharedData.SPLITTER + 
+				description + SharedData.SPLITTER +
+				ownerUsername + SharedData.SPLITTER +
+				premium + SharedData.SPLITTER +
+				latitude + SharedData.SPLITTER +
+				longitude + SharedData.SPLITTER +
+				startTime + SharedData.SPLITTER +
+				endTime + SharedData.SPLITTER +
+				getSwagSetCSV();
 	}
 	
 	public String getName()
@@ -77,9 +111,45 @@ public class EventEntry
 		return premium;
 	}
 	
+	public double getLatitude()
+	{
+		return latitude;
+	}
+	
+	public double getLongitude()
+	{
+		return longitude;
+	}
+	
 	public Set<SwagType> getSwagSet()
 	{
 		return swagSet;
+	}
+	
+	public String getSwagSetCSV()
+	{
+		StringBuilder b = new StringBuilder();
+		
+		for(SwagType type : swagSet) b.append(type.name() + ",");
+		if(b.length() > 0) b.deleteCharAt(b.length()-1);
+		
+		return b.toString();
+	}
+	
+	public void parseSwagSetCSV(String csv)
+	{
+		String[] swagSplit = csv.split(SharedData.SPLITTER_2);
+		
+		for(String s : swagSplit)
+		{
+			for(SwagType type : SwagType.values())
+			{
+				if(type.name().equals(s))
+				{
+					swagSet.add(type);
+				}
+			}
+		}
 	}
 	
 	public long getStartTime()

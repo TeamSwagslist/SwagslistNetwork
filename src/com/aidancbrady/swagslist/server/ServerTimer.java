@@ -1,6 +1,7 @@
-package com.aidancbrady.swagslist.network;
+package com.aidancbrady.swagslist.server;
 
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.aidancbrady.swagslist.EventEntry;
 
@@ -20,14 +21,20 @@ public final class ServerTimer extends Thread
 				Thread.sleep(1000*60);
 				long currentMillis = System.currentTimeMillis();
 				
-				for(Iterator<EventEntry> iter = ServerCore.instance().getEvents().iterator(); iter.hasNext();)
+				Set<EventEntry> events = SQLHandler.getEvents();
+				Set<String> toRemove = new HashSet<String>();
+				
+				for(EventEntry entry : events)
 				{
-					EventEntry entry = iter.next();
-					
 					if(currentMillis > entry.getEndTime())
 					{
-						iter.remove();
+						toRemove.add(entry.getName());
 					}
+				}
+				
+				for(String name : toRemove)
+				{
+					SQLHandler.removeEvent(name);
 				}
 			} catch(Exception e) {
 				e.printStackTrace();

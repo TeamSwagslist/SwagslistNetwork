@@ -1,29 +1,17 @@
-package com.aidancbrady.swagslist.network;
+package com.aidancbrady.swagslist.server;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashSet;
 import java.util.Set;
 
 import com.aidancbrady.swagslist.Account;
 import com.aidancbrady.swagslist.EventEntry;
+import com.aidancbrady.swagslist.SharedData;
 
-public class Connection extends Thread
-{
-	public static final String SPLITTER = ",";
-	public static final String SPLITTER_2 = ";";
-	
-	private static final Set<Character> ALLOWED_CHARS = new HashSet<Character>();
-	private static final int MAX_USERNAME_LENGTH = 24;
-	
-	static {
-		ALLOWED_CHARS.add('-');
-		ALLOWED_CHARS.add('_');
-		ALLOWED_CHARS.add('.');
-	}
-	
+public class ActiveConnection extends Thread
+{	
 	public Socket socket;
 	
 	public BufferedReader reader;
@@ -34,7 +22,7 @@ public class Connection extends Thread
 	
 	public Account account;
 	
-	public Connection(Socket s)
+	public ActiveConnection(Socket s)
 	{
 		socket = s;
 	}
@@ -52,16 +40,16 @@ public class Connection extends Thread
 			
 			while((reading = reader.readLine()) != null && !disconnected)
 			{
-				String[] msg = reading.trim().split(SPLITTER);
+				String[] msg = reading.trim().split(SharedData.SPLITTER);
 				
 				if(msg[0].equals("AUTH") && msg.length == 3)
 				{
-					Account acct = ServerCore.instance().lookup(msg[1]);
+					Account acct = SQLHandler.lookup(msg[1]);
 					
 					if(acct != null && acct.checkPassword(msg[2]))
 					{
 						account = acct;
-						writer.println(compileMsg(ResponseState.ACCEPT));
+						writer.println(compileMsg(ResponseState.ACCEPT, acct.getName()));
 					}
 					else {
 						writer.println(compileMsg(ResponseState.REJECT, "Bad credentials"));
@@ -69,7 +57,7 @@ public class Connection extends Thread
 				}
 				else if(msg[0].equals("REGISTER") && msg.length == 4)
 				{
-					if(ServerCore.instance().lookup(msg[2]) != null)
+					if(SQLHandler.lookup(msg[2]) != null)
 					{
 						writer.println(compileMsg(ResponseState.REJECT, "Account already exists"));
 					}
@@ -82,7 +70,7 @@ public class Connection extends Thread
 					
 					if(acct.initPassword(msg[3]))
 					{
-						ServerCore.instance().addAccount(acct);
+						SQLHandler.addAccount(acct);
 						writer.println(compileMsg(ResponseState.ACCEPT));
 					}
 					else {
@@ -96,18 +84,18 @@ public class Connection extends Thread
 						writer.println(compileMsg(ResponseState.REJECT, "Not authenticated"));
 					}
 					else {
-						EventEntry newEntry = EventEntry.createEntry(msg, 1);
+						EventEntry newEntry = EventEntry.createFromCSV(msg, 1);
 						
 						if(newEntry == null)
 						{
 							writer.println(compileMsg(ResponseState.REJECT, "Unable to create event"));
 						}
-						else if(ServerCore.instance().containsEvent(newEntry.getName()))
+						else if(SQLHandler.containsEvent(newEntry.getName()))
 						{
 							writer.println(compileMsg(ResponseState.REJECT, "Event already exists"));
 						}
 						else {
-							ServerCore.instance().addEvent(newEntry);
+							SQLHandler.addEvent(newEntry);
 							writer.println(compileMsg(ResponseState.ACCEPT));
 						}
 					}
@@ -121,22 +109,36 @@ public class Connection extends Thread
 					else {
 						String origName = msg[1];
 						
-						if(!ServerCore.instance().containsEvent(origName))
+						if(!SQLHandler.containsEvent(origName))
 						{
 							writer.println(compileMsg(ResponseState.REJECT, "Event does not exist"));
 						}
 						else {
-							EventEntry newEntry = EventEntry.createEntry(msg, 2);
+							EventEntry newEntry = EventEntry.createFromCSV(msg, 2);
 							
 							if(newEntry == null)
 							{
 								writer.println(compileMsg(ResponseState.REJECT, "Unable to create event"));
 							}
+							else if(!account.getUsername().equals(newEntry.getOwnerUsername()))
+							{
+								writer.println(compileMsg(ResponseState.REJECT, "Invalid event owner"));
+							}
 							else {
-								ServerCore.instance().addEvent(newEntry);
+								SQLHandler.addEvent(newEntry);
 								writer.println(compileMsg(ResponseState.ACCEPT));
 							}
 						}
+					}
+				}
+				else if(msg[0].equals("LISTENTRIES"))
+				{
+					Set<EventEntry> entries = SQLHandler.getEvents();
+					writer.println(compileMsg(ResponseState.ACCEPT, entries.size()));
+					
+					for(EventEntry entry : entries)
+					{
+						writer.println(entry.toCSV());
 					}
 				}
 				else {
@@ -158,11 +160,11 @@ public class Connection extends Thread
 	
 	public boolean isValidUsername(String s)
 	{
-		if(s.length() > MAX_USERNAME_LENGTH) return false;
+		if(s.length() > SharedData.MAX_USERNAME_LENGTH) return false;
 		
 		for(char c : s.toCharArray())
 		{
-			if(!ALLOWED_CHARS.contains(c) && !Character.isLetterOrDigit(c))
+			if(!SharedData.ALLOWED_CHARS.contains(c) && !Character.isLetterOrDigit(c))
 			{
 				return false;
 			}
@@ -175,7 +177,7 @@ public class Connection extends Thread
 	{
 		StringBuilder str = new StringBuilder();
 		
-		str.append(state.name() + (strings.length > 0 ? SPLITTER : ""));
+		str.append(state.name() + (strings.length > 0 ? SharedData.SPLITTER : ""));
 		
 		for(int i = 0; i < strings.length; i++)
 		{
@@ -183,7 +185,7 @@ public class Connection extends Thread
 			
 			if(i < strings.length-1)
 			{
-				str.append(SPLITTER);
+				str.append(SharedData.SPLITTER);
 			}
 		}
 		
