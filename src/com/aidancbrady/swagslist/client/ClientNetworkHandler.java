@@ -86,7 +86,6 @@ public class ClientNetworkHandler
 				if(split[0].equals("ACCEPT"))
 				{
 					SessionData.username = username;
-					SessionData.fullName = split[1];
 					return Response.ACCEPT;
 				}
 				else {
@@ -101,9 +100,9 @@ public class ClientNetworkHandler
 		return Response.ERROR;
 	}
 	
-	public Response register(String name, String username, String password)
+	public Response register(String username, String password)
 	{
-		List<String> response = sendMessages("REGISTER," + name + "," + username + "," + password);
+		List<String> response = sendMessages("REGISTER," + username + "," + password);
 		
 		try {
 			if(response != null)
@@ -113,7 +112,6 @@ public class ClientNetworkHandler
 				if(split[0].equals("ACCEPT"))
 				{
 					SessionData.username = username;
-					SessionData.fullName = name;
 					return Response.ACCEPT;
 				}
 				else {
@@ -122,6 +120,40 @@ public class ClientNetworkHandler
 			}
 		} catch(Exception e) {
 			SessionData.reset();
+			e.printStackTrace();
+		}
+		
+		return Response.ERROR;
+	}
+	
+	public Response addEvent(EventEntry entry)
+	{
+		List<String> response = sendMessages("ADDEVENT," + entry.toCSV());
+		
+		try {
+			if(response != null)
+			{
+				String[] split = response.get(0).split(SharedData.SPLITTER);
+				return split[0].equals("ACCEPT") ? Response.ACCEPT : new Response(false, split[1]);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return Response.ERROR;
+	}
+	
+	public Response editEvent(String origName, EventEntry entry)
+	{
+		List<String> response = sendMessages("EDITEVENT," + origName + "," + entry.toCSV());
+		
+		try {
+			if(response != null)
+			{
+				String[] split = response.get(0).split(SharedData.SPLITTER);
+				return split[0].equals("ACCEPT") ? Response.ACCEPT : new Response(false, split[1]);
+			}
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		
