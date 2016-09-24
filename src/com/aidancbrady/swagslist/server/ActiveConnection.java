@@ -65,16 +65,17 @@ public class ActiveConnection extends Thread
 					{
 						writer.println(compileMsg(ResponseState.REJECT, "Invalid username"));
 					}
-					
-					Account acct = new Account(msg[1], msg[2]);
-					
-					if(acct.initPassword(msg[3]))
-					{
-						SQLHandler.addAccount(acct);
-						writer.println(compileMsg(ResponseState.ACCEPT));
-					}
 					else {
-						writer.println(compileMsg(ResponseState.REJECT, "Failed to create account"));
+						Account acct = new Account(msg[1], msg[2]);
+						
+						if(acct.initPassword(msg[3]))
+						{
+							SQLHandler.addAccount(acct);
+							writer.println(compileMsg(ResponseState.ACCEPT));
+						}
+						else {
+							writer.println(compileMsg(ResponseState.REJECT, "Failed to create account"));
+						}
 					}
 				}
 				else if(msg[0].equals("NEWENTRY"))
