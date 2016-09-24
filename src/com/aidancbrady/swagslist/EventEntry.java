@@ -32,7 +32,7 @@ public class EventEntry
 		}
 		
 		entry.name = data[start];
-		entry.description = data[start+1];
+		entry.description = data[start+1].replace(SharedData.NEWLINE, "\n");
 		entry.ownerUsername = data[start+2];
 		entry.premium = data[start+3].equals("true");
 		entry.latitude = Double.parseDouble(data[start+4]);
@@ -81,7 +81,7 @@ public class EventEntry
 	public String toCSV()
 	{
 		return name + SharedData.SPLITTER + 
-				description + SharedData.SPLITTER +
+				description.replace("\n", SharedData.NEWLINE) + SharedData.SPLITTER +
 				ownerUsername + SharedData.SPLITTER +
 				premium + SharedData.SPLITTER +
 				latitude + SharedData.SPLITTER +
