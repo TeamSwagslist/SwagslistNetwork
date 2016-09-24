@@ -44,7 +44,7 @@ public class SQLHandler
 		try {
 			while(results.next())
 			{
-				return new Account(results.getString(1), results.getString(2), results.getString(3), results.getString(4));
+				return new Account(results.getString(1), results.getString(2), results.getString(3));
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -56,7 +56,6 @@ public class SQLHandler
 	public static void addAccount(Account account)
 	{
 		runUpdate("INSERT INTO accounts VALUES(" + 
-				"'" + account.getName() + "'," +
 				"'" + account.getUsername() + "'," +
 				"'" + account.getPasswordHash() + "'," +
 				"'" + account.getPasswordSalt() + "')");

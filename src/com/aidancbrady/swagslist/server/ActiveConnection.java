@@ -49,26 +49,26 @@ public class ActiveConnection extends Thread
 					if(acct != null && acct.checkPassword(msg[2]))
 					{
 						account = acct;
-						writer.println(compileMsg(ResponseState.ACCEPT, acct.getName()));
+						writer.println(compileMsg(ResponseState.ACCEPT));
 					}
 					else {
 						writer.println(compileMsg(ResponseState.REJECT, "Bad credentials"));
 					}
 				}
-				else if(msg[0].equals("REGISTER") && msg.length == 4)
+				else if(msg[0].equals("REGISTER") && msg.length == 3)
 				{
-					if(SQLHandler.lookup(msg[2]) != null)
+					if(SQLHandler.lookup(msg[1]) != null)
 					{
 						writer.println(compileMsg(ResponseState.REJECT, "Account already exists"));
 					}
-					else if(!isValidUsername(msg[2]))
+					else if(!isValidUsername(msg[1]))
 					{
 						writer.println(compileMsg(ResponseState.REJECT, "Invalid username"));
 					}
 					else {
-						Account acct = new Account(msg[1], msg[2]);
+						Account acct = new Account(msg[1]);
 						
-						if(acct.initPassword(msg[3]))
+						if(acct.initPassword(msg[2]))
 						{
 							SQLHandler.addAccount(acct);
 							writer.println(compileMsg(ResponseState.ACCEPT));

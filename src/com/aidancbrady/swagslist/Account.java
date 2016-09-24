@@ -2,22 +2,19 @@ package com.aidancbrady.swagslist;
 
 public class Account
 {
-	private String name;
-	
 	private String username;
 	
 	private String passwordSalt;
 	private String passwordHash;
 	
-	public Account(String name, String username)
+	public Account(String username)
 	{
-		this.name = name;
 		this.username = username;
 	}
 	
-	public Account(String name, String username, String passwordSalt, String passwordHash)
+	public Account(String username, String passwordSalt, String passwordHash)
 	{
-		this(name, username);
+		this(username);
 		
 		this.passwordSalt = passwordSalt;
 		this.passwordHash = passwordHash;
@@ -43,11 +40,6 @@ public class Account
 			e.printStackTrace();
 			return false;
 		}
-	}
-	
-	public String getName()
-	{
-		return name;
 	}
 	
 	public String getUsername()

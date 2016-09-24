@@ -1,7 +1,8 @@
 package com.aidancbrady.swagslist;
 
 import java.sql.ResultSet;
-import java.util.EnumSet;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 public class EventEntry
@@ -20,7 +21,7 @@ public class EventEntry
 	private long startTime;
 	private long endTime;
 	
-	private EnumSet<SwagType> swagSet = EnumSet.noneOf(SwagType.class);
+	private Set<SwagType> swagSet = new HashSet<SwagType>();
 	
 	public static EventEntry createFromCSV(String[] data, int start)
 	{
@@ -89,6 +90,47 @@ public class EventEntry
 				startTime + SharedData.SPLITTER +
 				endTime + SharedData.SPLITTER +
 				getSwagSetCSV();
+	}
+	
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+	
+	public void setOwnerUsername(String ownerUsername)
+	{
+		this.ownerUsername = ownerUsername;
+	}
+	
+	public void setPremium(boolean premium)
+	{
+		this.premium = premium;
+	}
+	
+	public void setLocation(double latitude, double longitude)
+	{
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+	
+	public void setStartTime(long startTime)
+	{
+		this.startTime = startTime;
+	}
+	
+	public void setEndTime(long endTime)
+	{
+		this.endTime = endTime;
+	}
+	
+	public void setSwagSet(Collection<SwagType> swagSet)
+	{
+		swagSet = new HashSet<>(swagSet);
 	}
 	
 	public String getName()
