@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.Set;
 
 import com.aidancbrady.swagslist.Account;
@@ -81,25 +82,19 @@ public class ActiveConnection extends Thread
 				}
 				else if(msg[0].equals("NEWENTRY"))
 				{
-					if(account == null)
+					EventEntry newEntry = EventEntry.createFromCSV(msg, 1);
+					
+					if(newEntry == null)
 					{
-						writer.println(compileMsg(ResponseState.REJECT, "Not authenticated"));
+						writer.println(compileMsg(ResponseState.REJECT, "Unable to create event"));
+					}
+					else if(SQLHandler.containsEvent(newEntry.getName()))
+					{
+						writer.println(compileMsg(ResponseState.REJECT, "Event already exists"));
 					}
 					else {
-						EventEntry newEntry = EventEntry.createFromCSV(msg, 1);
-						
-						if(newEntry == null)
-						{
-							writer.println(compileMsg(ResponseState.REJECT, "Unable to create event"));
-						}
-						else if(SQLHandler.containsEvent(newEntry.getName()))
-						{
-							writer.println(compileMsg(ResponseState.REJECT, "Event already exists"));
-						}
-						else {
-							SQLHandler.addEvent(newEntry);
-							writer.println(compileMsg(ResponseState.ACCEPT));
-						}
+						SQLHandler.addEvent(newEntry);
+						writer.println(compileMsg(ResponseState.ACCEPT));
 					}
 				}
 				else if(msg[0].equals("EDITENTRY") && msg.length > 2)
@@ -136,12 +131,17 @@ public class ActiveConnection extends Thread
 				else if(msg[0].equals("LISTENTRIES"))
 				{
 					Set<EventEntry> entries = SQLHandler.getEvents();
-					writer.println(compileMsg(ResponseState.ACCEPT, entries.size()));
+					StringBuilder builder = new StringBuilder();
+					builder.append(ResponseState.ACCEPT + SharedData.PRIME_SPLITTER + entries.size());
+					if(entries.size() > 0) builder.append(SharedData.PRIME_SPLITTER);
 					
-					for(EventEntry entry : entries)
+					for(Iterator<EventEntry> iter = entries.iterator(); iter.hasNext();)
 					{
-						writer.println(entry.toCSV());
+						builder.append(iter.next().toCSV());
+						if(iter.hasNext()) builder.append(SharedData.PRIME_SPLITTER);
 					}
+					
+					writer.println(builder.toString());
 				}
 				else {
 					writer.println(compileMsg(ResponseState.REJECT, "Unknown command"));
@@ -177,9 +177,14 @@ public class ActiveConnection extends Thread
 	
 	public static String compileMsg(ResponseState state, Object... strings)
 	{
+		return compileMsg(state, SharedData.SPLITTER, strings);
+	}
+	
+	public static String compileMsg(ResponseState state, String splitter, Object... strings)
+	{
 		StringBuilder str = new StringBuilder();
 		
-		str.append(state.name() + (strings.length > 0 ? SharedData.SPLITTER : ""));
+		str.append(state.name() + (strings.length > 0 ? splitter : ""));
 		
 		for(int i = 0; i < strings.length; i++)
 		{
@@ -187,7 +192,7 @@ public class ActiveConnection extends Thread
 			
 			if(i < strings.length-1)
 			{
-				str.append(SharedData.SPLITTER);
+				str.append(splitter);
 			}
 		}
 		

@@ -15,8 +15,9 @@ public class SharedData
 	public static final String SQL_PASS = "hack_gt_db";
 	
 	//CSV splitters
-	public static final String SPLITTER = "&1&";
-	public static final String SPLITTER_2 = "&2&";
+	public static final String PRIME_SPLITTER = "&0&";
+	public static final String SPLITTER = "%1%";
+	public static final String SPLITTER_2 = "[2]";
 	public static final String NEWLINE = "&NL&";
 	
 	public static final Set<Character> ALLOWED_CHARS = new HashSet<Character>();

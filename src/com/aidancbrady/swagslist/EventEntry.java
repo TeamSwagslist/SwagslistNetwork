@@ -3,6 +3,7 @@ package com.aidancbrady.swagslist;
 import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class EventEntry
@@ -27,7 +28,7 @@ public class EventEntry
 	{
 		EventEntry entry = new EventEntry();
 		
-		if(data.length-start != 6)
+		if(data.length-start != 9)
 		{
 			return null;
 		}
@@ -159,8 +160,11 @@ public class EventEntry
 	{
 		StringBuilder b = new StringBuilder();
 		
-		for(SwagType type : swagSet) b.append(type.name() + ",");
-		if(b.length() > 0) b.deleteCharAt(b.length()-1);
+		for(Iterator<SwagType> iter = swagSet.iterator(); iter.hasNext();)
+		{
+			SwagType type = iter.next();
+			b.append(type.name() + (iter.hasNext() ? SharedData.SPLITTER_2 : ""));
+		}
 		
 		return b.toString();
 	}

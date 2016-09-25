@@ -72,7 +72,7 @@ public class SQLHandler
 				entry.getLongitude() + "," +
 				entry.getStartTime() + "," +
 				entry.getEndTime() + "," +
-				entry.getSwagSetCSV() + ")");
+				"'" + entry.getSwagSetCSV() + "')");
 	}
 	
 	public static Set<EventEntry> getEvents()
