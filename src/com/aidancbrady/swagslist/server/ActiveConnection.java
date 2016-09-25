@@ -35,11 +35,12 @@ public class ActiveConnection extends Thread
 		try {
 			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			writer = new PrintWriter(socket.getOutputStream(), true);
-			
+			System.out.println("Connection initialized with " + socket.getInetAddress());
 			String reading = "";
 			
 			while((reading = reader.readLine()) != null && !disconnected)
 			{
+				System.out.println("Received msg " + reading.trim());
 				String[] msg = reading.trim().split(SharedData.SPLITTER);
 				
 				if(msg[0].equals("AUTH") && msg.length == 3)

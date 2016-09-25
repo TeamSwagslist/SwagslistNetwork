@@ -21,10 +21,11 @@ public class ServerCore
 	{
 		try {
 			socket = new ServerSocket(SharedData.SERVER_PORT);
-			new ConnectionHandler().start();
-			new ServerTimer().start();
 			
 			serverRunning = true;
+			
+			new ConnectionHandler().start();
+			new ServerTimer().start();
 			
 			System.out.println("Server initiated.");
 			
