@@ -5,11 +5,11 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import com.aidancbrady.swagslist.SharedData;
+
 public class ServerCore 
 {
 	private static final ServerCore INSTANCE = new ServerCore();
-	
-	public static final int SERVER_PORT = 29000;
 	
 	private ServerSocket socket;
 	
@@ -20,7 +20,7 @@ public class ServerCore
 	private void init()
 	{
 		try {
-			socket = new ServerSocket(SERVER_PORT);
+			socket = new ServerSocket(SharedData.SERVER_PORT);
 			new ConnectionHandler().start();
 			new ServerTimer().start();
 			

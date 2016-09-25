@@ -7,7 +7,7 @@ public class SharedData
 {
 	//Server data
 	public static final String SERVER_IP = "104.236.13.142";
-	public static final int SERVER_PORT = 29000;
+	public static final int SERVER_PORT = 29421;
 	
 	//SQL data
 	public static final String SQL_URL = "jdbc:mysql://localhost:3306/swagslist";
