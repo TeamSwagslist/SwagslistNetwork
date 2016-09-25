@@ -159,6 +159,7 @@ public class EventEntry
 	public String getSwagSetCSV()
 	{
 		StringBuilder b = new StringBuilder();
+		if(swagSet.isEmpty()) b.append("null");
 		
 		for(Iterator<SwagType> iter = swagSet.iterator(); iter.hasNext();)
 		{
