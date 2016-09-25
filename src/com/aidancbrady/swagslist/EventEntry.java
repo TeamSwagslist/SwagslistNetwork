@@ -42,19 +42,6 @@ public class EventEntry
 		entry.endTime = Long.parseLong(data[start+7]);
 		entry.parseSwagSetCSV(data[start+8]);
 		
-		String[] swagSplit = data[start+8].split(SharedData.SPLITTER_2);
-		
-		for(String s : swagSplit)
-		{
-			for(SwagType type : SwagType.values())
-			{
-				if(type.name().equals(s))
-				{
-					entry.swagSet.add(type);
-				}
-			}
-		}
-		
 		return entry;
 	}
 	

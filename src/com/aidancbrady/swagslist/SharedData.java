@@ -10,7 +10,7 @@ public class SharedData
 	public static final int SERVER_PORT = 29000;
 	
 	//SQL data
-	public static final String SQL_URL = "jdbc:mysql://" + SERVER_IP + ":3306/swagslist";
+	public static final String SQL_URL = "jdbc:mysql://localhost:3306/swagslist";
 	public static final String SQL_USER = "server";
 	public static final String SQL_PASS = "hack_gt_db";
 	
