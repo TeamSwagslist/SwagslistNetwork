@@ -177,14 +177,9 @@ public class ActiveConnection extends Thread
 	
 	public static String compileMsg(ResponseState state, Object... strings)
 	{
-		return compileMsg(state, SharedData.SPLITTER, strings);
-	}
-	
-	public static String compileMsg(ResponseState state, String splitter, Object... strings)
-	{
 		StringBuilder str = new StringBuilder();
 		
-		str.append(state.name() + (strings.length > 0 ? splitter : ""));
+		str.append(state.name() + (strings.length > 0 ? SharedData.SPLITTER : ""));
 		
 		for(int i = 0; i < strings.length; i++)
 		{
@@ -192,7 +187,7 @@ public class ActiveConnection extends Thread
 			
 			if(i < strings.length-1)
 			{
-				str.append(splitter);
+				str.append(SharedData.SPLITTER);
 			}
 		}
 		
